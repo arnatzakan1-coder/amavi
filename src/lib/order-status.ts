@@ -1,0 +1,11 @@
+export const ORDER_STATUSES = [
+  "PENDING_PAYMENT",
+  "AWAITING_CONFIRMATION",
+  "PAID",
+  "PERFUMER_REVIEW",
+  "IN_PRODUCTION",
+  "READY",
+  "SHIPPED",
+  "DELIVERED",
+  "CANCELLED",
+] as const;
