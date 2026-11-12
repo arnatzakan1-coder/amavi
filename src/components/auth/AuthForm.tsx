@@ -22,13 +22,14 @@ function AppleIcon() {
   );
 }
 
-export function AuthForm({ mode, next, oauth }: { mode: "login" | "register"; next: string; oauth: { google: boolean; apple: boolean } }) {
+export function AuthForm({ mode, next, oauth, registered = false }: { mode: "login" | "register"; next: string; oauth: { google: boolean; apple: boolean }; registered?: boolean }) {
   const { t } = useI18n();
   const [state, action, pending] = useActionState<AuthState, FormData>(mode === "login" ? loginAction : registerAction, undefined);
   const err = state?.error;
   return (
     <div className="card p-6 sm:p-9 w-full max-w-md">
       <h1 className="text-4xl">{mode === "login" ? t.auth.loginTitle : t.auth.registerTitle}</h1>
+      {registered && <p role="status" className="mt-4 text-sm text-ok">{t.auth.registered}</p>}
 
       {(oauth.google || oauth.apple) && (
         <div className="mt-7 grid gap-3">
@@ -96,7 +97,7 @@ export function AuthForm({ mode, next, oauth }: { mode: "login" | "register"; ne
         </div>
         {err && (
           <p id="auth-error" role="alert" className="field-error">
-            {err === "exists" ? t.auth.exists : err === "invalid" ? t.auth.invalid : t.common.required}
+            {{ exists: t.auth.exists, invalid: t.auth.invalid, name: t.auth.nameRequired, email: t.auth.emailInvalid, password: t.auth.passwordShort, server: t.auth.serverError }[err]}
           </p>
         )}
         <button className="btn btn-gold mt-2" disabled={pending}>

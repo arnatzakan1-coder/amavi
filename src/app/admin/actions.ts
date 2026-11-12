@@ -9,6 +9,7 @@ import { assertAdmin } from "@/lib/session";
 import { setSetting, getSetting } from "@/lib/data";
 import { FAMILIES, TIERS, isFamily, isTier } from "@/lib/families";
 import { ORDER_STATUSES } from "@/lib/order-status";
+import { normalizeKzPhone } from "@/lib/phone";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const optStr = (f: FormData, k: string) => (str(f, k) === "" ? null : str(f, k));
@@ -213,7 +214,7 @@ export async function updateBoutique(form: FormData) {
   const lat = num(form, "lat");
   const lon = num(form, "lon");
   const url = optStr(form, "twoGisUrl");
-  const phone = str(form, "phone").replace(/[^\d+]/g, "");
+  const phone = normalizeKzPhone(str(form, "phone")) ?? "+77765518509";
   await setSetting("boutique", {
     addressRu: str(form, "addressRu"),
     addressKk: str(form, "addressKk"),
@@ -223,8 +224,8 @@ export async function updateBoutique(form: FormData) {
     lon: lon != null && Math.abs(lon) <= 180 ? lon : null,
     twoGisUrl: url && /^https:\/\/(go\.)?2gis\.(kz|ru|com)\//.test(url) ? url : null,
     hours: optStr(form, "hours"),
-    phone: phone || "+77751234567",
-    whatsapp: phone.replace(/\D/g, "") || "77751234567",
+    phone,
+    whatsapp: phone.replace(/\D/g, ""),
     listingUrl: optStr(form, "listingUrl"),
     leaseSigned: bool(form, "leaseSigned"),
   });

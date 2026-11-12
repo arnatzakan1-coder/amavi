@@ -57,16 +57,16 @@ test("too many notes", () => {
 });
 
 const cfg = {
-  volumes: [{ ml: 10, priceKzt: 9900, active: true }, { ml: 30, priceKzt: 21900, active: true }],
+  volumes: [{ ml: 10, priceKzt: 9990, active: true }, { ml: 30, priceKzt: 21990, active: true }],
   concentrations: [{ pct: 20, surchargeKzt: 0, active: true }, { pct: 25, surchargeKzt: 0, active: true }],
-  giftSet: { enabled: true, bottles: 3, volumeMl: 10, priceKzt: 26900 },
+  giftSet: { enabled: true, bottles: 3, volumeMl: 10, priceKzt: 21990 },
 };
 
 test("pricing: docx prices, gift set and delivery", () => {
   const p = priceOrder([{ volumeMl: 10, concentrationPct: 20, qty: 3 }, { volumeMl: 30, concentrationPct: 20, qty: 1 }], cfg, 1500);
-  assert.equal(p.subtotalKzt, 3 * 9900 + 21900);
-  assert.equal(p.discountKzt, 29700 - 26900);
-  assert.equal(p.totalKzt, 26900 + 21900 + 1500);
+  assert.equal(p.subtotalKzt, 3 * 9990 + 21990);
+  assert.equal(p.discountKzt, 29970 - 21990);
+  assert.equal(p.totalKzt, 21990 + 21990 + 1500);
 });
 
 test("pricing rejects unknown volume and bad qty", () => {
@@ -97,4 +97,5 @@ test("phone", () => {
   assert.equal(formatKzPhoneInput("+78775123456"), "+7 775 123 45 6");
   assert.equal(normalizeKzPhone("+7 8775 123 45 67"), "+77751234567");
   assert.equal(normalizeKzPhone("7751234567"), "+77751234567");
+  assert.equal(normalizeKzPhone("87765518509"), "+77765518509");
 });

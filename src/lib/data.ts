@@ -26,7 +26,7 @@ const DEFAULTS = {
   giftSet: { enabled: false, bottles: 3, volumeMl: 10, priceKzt: 0 } as GiftSet,
   boutique: {
     addressRu: "", addressKk: "", addressEn: "", areaM2: null, lat: null, lon: null,
-    twoGisUrl: null, hours: null, phone: "+77751234567", whatsapp: "77751234567", listingUrl: null, leaseSigned: false,
+    twoGisUrl: null, hours: null, phone: "+77765518509", whatsapp: "77765518509", listingUrl: null, leaseSigned: false,
   } as Boutique,
 };
 

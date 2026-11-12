@@ -45,7 +45,6 @@ export default async function BoutiquePage() {
             <div>
               <h2 className="font-sans text-xs uppercase tracking-[0.2em] text-muted">{t.boutique.address}</h2>
               <p className="mt-1 font-display text-2xl">{address}</p>
-              {b.areaM2 && <p className="text-xs text-muted mt-1">{b.areaM2} m²</p>}
             </div>
           </div>
           <div className="flex gap-4">

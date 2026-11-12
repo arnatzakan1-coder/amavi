@@ -2,10 +2,10 @@
  * AMAVI seed.
  * Sources:
  *  - notes-source.json  ← finmodel sheet T2_Notes (30 notes, family, supplier, material, safety note)
- *  - prices             ← AMAVI_Step1_corrected.docx §1.2 / §4.1 (10 ml 9,900 ₸, 30 ml 21,900 ₸, gift set 26,900 ₸)
+ *  - prices             ← set by the team: 10 ml 9,990 ₸, 30 ml 21,990 ₸, gift set 3×10 ml 21,990 ₸
  *  - concentrations     ← finmodel Assumptions "conc": allowed 15 / 20 / 25 %, standard 20 %
  *  - courier Almaty     ← finmodel Assumptions "deliv": 1,500 ₸ (estimate)
- *  - boutique address   ← docx §4.1: Radostovets St. 165/1, Bostandyk District, Almaty, 50 m²
+ *  - boutique address   ← docx §4.1: Radostovets St. 165/1, Bostandyk District, Almaty
  * Everything not present in the files is seeded as an editable DRAFT and flagged in the admin panel.
  */
 import { eq } from "drizzle-orm";
@@ -106,20 +106,20 @@ const SETTINGS: Record<string, unknown> = {
     enabled: true,
     bottles: 3,
     volumeMl: 10,
-    priceKzt: 26900,
+    priceKzt: 21990,
   },
   boutique: {
     addressRu: "ул. Радостовца, 165/1, Бостандыкский район, Алматы",
     addressKk: "Радостовец к-сі, 165/1, Бостандық ауданы, Алматы",
     addressEn: "165/1 Radostovets St., Bostandyk District, Almaty",
-    areaM2: 50,
+    areaM2: null,
     // Coordinates and the exact 2GIS card are not in the files → fill in the admin panel.
     lat: null,
     lon: null,
     twoGisUrl: "https://2gis.kz/almaty/search/" + encodeURIComponent("Радостовца 165/1"),
     hours: null,
-    phone: "+77751234567",
-    whatsapp: "77751234567",
+    phone: "+77765518509",
+    whatsapp: "77765518509",
     listingUrl: "https://krisha.kz/a/show/1016465325",
     leaseSigned: false,
   },
@@ -161,8 +161,8 @@ export async function runSeed() {
   }
 
   await db.insert(s.volumes).values([
-    { ml: 10, priceKzt: 9900, sortOrder: 0 },
-    { ml: 30, priceKzt: 21900, sortOrder: 1 },
+    { ml: 10, priceKzt: 9990, sortOrder: 0 },
+    { ml: 30, priceKzt: 21990, sortOrder: 1 },
   ]).onConflictDoNothing();
 
   await db.insert(s.concentrations).values(
