@@ -14,7 +14,7 @@ export default async function CartPage() {
   return (
     <div className="container-lux py-10 sm:py-14">
       <h1 className="text-4xl sm:text-5xl">{t.cart.title}</h1>
-      <CartView config={config} volumes={volumes.map((v) => v.ml)} concentrations={concs.map((c) => c.pct)} />
+      <CartView config={config} volumes={volumes.map((v) => v.ml)} concentrations={[...concs].sort((a, b) => Number(b.isDefault) - Number(a.isDefault)).map((c) => c.pct)} />
     </div>
   );
 }

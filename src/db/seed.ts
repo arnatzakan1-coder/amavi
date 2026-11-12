@@ -166,7 +166,8 @@ export async function runSeed() {
   ]).onConflictDoNothing();
 
   await db.insert(s.concentrations).values(
-    [15, 20, 25].map((pct) => ({ pct, isDefault: pct === 20, surchargeKzt: 0 })),
+    // One fixed concentration: 15% (Eau de Parfum). The finmodel allows 15–25%; the team chose 15%.
+    [15].map((pct) => ({ pct, isDefault: true, surchargeKzt: 0 })),
   ).onConflictDoNothing();
 
   const delivery = [

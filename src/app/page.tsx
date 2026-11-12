@@ -111,7 +111,7 @@ export default async function Home() {
       <section className="border-y border-line bg-ink-2">
         <div className="container-lux py-20 sm:py-24 grid lg:grid-cols-[1fr_1.4fr] gap-10 items-end">
           <Reveal>
-            <p className="eyebrow">Extrait de parfum</p>
+            <p className="eyebrow">Eau de Parfum</p>
             <h2 className="mt-4 text-4xl sm:text-5xl">{t.home.pricesTitle}</h2>
             <p className="mt-4 text-cream/70">{t.home.pricesNote}</p>
           </Reveal>

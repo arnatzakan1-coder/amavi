@@ -13,7 +13,10 @@ export function CartView({ config, volumes, concentrations }: { config: PriceCon
 
   if (!hydrated) return <div className="mt-8 card h-48 animate-pulse" aria-busy="true" />;
 
-  const valid = items.filter((i) => volumes.includes(i.volumeMl) && concentrations.includes(i.concentrationPct));
+  // Items saved at a retired concentration are shown (and ordered) at the current one.
+  const valid = items
+    .filter((i) => volumes.includes(i.volumeMl))
+    .map((i) => (concentrations.includes(i.concentrationPct) ? i : { ...i, concentrationPct: concentrations[0] }));
   if (valid.length === 0) {
     return (
       <div className="mt-10 card p-10 text-center">

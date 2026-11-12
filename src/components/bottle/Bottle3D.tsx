@@ -31,7 +31,7 @@ function useLabelTexture(text: string) {
     g.fillText("AMAVI", c.width / 2, 250);
     g.fillStyle = "#8a6a33";
     g.font = "500 24px 'Montserrat Variable', Arial, sans-serif";
-    g.fillText("E X T R A I T   D E   P A R F U M", c.width / 2, 310);
+    g.fillText("E A U   D E   P A R F U M", c.width / 2, 310);
     g.fillStyle = "#3a3229";
     g.font = "italic 400 44px Cormorant, 'Times New Roman', serif";
     const name = text.length > 22 ? text.slice(0, 21) + "…" : text;

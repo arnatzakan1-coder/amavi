@@ -4,13 +4,25 @@ import { db, schema as s } from "@/db";
 import { evaluate, withFixedNotes } from "./composition";
 import { getConcentrations, getNotes, getPairs, getSetting, toRule } from "./data";
 
+/** A concentration that is no longer offered (e.g. a formula saved at 20% after the shop
+ *  switched to a single 15% option) is moved to the current default instead of failing. */
+export function pickConcentration(pct: number, concs: { pct: number; isDefault: boolean }[]): number {
+  if (concs.some((c) => c.pct === pct)) return pct;
+  return concs.find((c) => c.isDefault)?.pct ?? concs[0]?.pct ?? pct;
+}
+
+export async function resolveConcentration(pct: number) {
+  return pickConcentration(pct, await getConcentrations());
+}
+
 /** Loads everything needed to validate a formula on the server. */
-export async function validateOnServer(items: { slug: string; parts: number; tier: "TOP" | "HEART" | "BASE" }[], concentrationPct: number) {
+export async function validateOnServer(items: { slug: string; parts: number; tier: "TOP" | "HEART" | "BASE" }[], requestedPct: number) {
   const [notes, rules, pairs, concs] = await Promise.all([getNotes(), getSetting("rules"), getPairs(), getConcentrations()]);
+  const concentrationPct = pickConcentration(requestedPct, concs);
   const rulesList = notes.map(toRule);
   const fixed = withFixedNotes(items, rulesList);
   const result = evaluate(fixed, rulesList, rules, pairs, concentrationPct, concs.map((c) => c.pct));
-  return { result, notes, items: fixed };
+  return { result, notes, items: fixed, concentrationPct };
 }
 
 export async function getFormulasForUser(userId: string, onlyIds?: string[]) {

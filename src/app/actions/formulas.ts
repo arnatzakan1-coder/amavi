@@ -28,7 +28,8 @@ export async function saveFormula(input: unknown): Promise<SaveResult> {
   if (!parsed.success) return { ok: false, reason: "INPUT" };
   const data = parsed.data;
 
-  const { result, notes, items } = await validateOnServer(data.items, data.concentrationPct);
+  const { result, notes, items, concentrationPct } = await validateOnServer(data.items, data.concentrationPct);
+  data.concentrationPct = concentrationPct;
   if (!result.ok) return { ok: false, reason: "RULES", errors: result.errors };
 
   const noteId = new Map(notes.map((n) => [n.slug, n.id]));

@@ -310,7 +310,7 @@ export async function saveCollection(form: FormData) {
     descKk: optStr(form, "descKk"),
     descEn: optStr(form, "descEn"),
     itemsJson: JSON.stringify(items),
-    concentrationPct: Math.round(num(form, "concentrationPct") ?? 20),
+    concentrationPct: Math.round(num(form, "concentrationPct") ?? 15),
     eventSlug: optStr(form, "eventSlug"),
     active: bool(form, "active"),
     sortOrder: Math.round(num(form, "sortOrder") ?? 0),

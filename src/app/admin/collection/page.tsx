@@ -12,7 +12,7 @@ function CollectionForm({ c, events }: { c?: C; events: { slug: string; nameRu: 
     <form action={saveCollection} className="grid gap-4 md:grid-cols-3">
       {c && <input type="hidden" name="id" value={c.id} />}
       <Input label="Название" name="name" defaultValue={c?.name} required />
-      <Input label="Концентрация, %" name="concentrationPct" type="number" defaultValue={c?.concentrationPct ?? 20} />
+      <Input label="Концентрация, %" name="concentrationPct" type="number" defaultValue={c?.concentrationPct ?? 15} />
       <div>
         <label htmlFor="ev" className="field-label">Событие</label>
         <select id="ev" name="eventSlug" defaultValue={c?.eventSlug ?? ""} className="field">

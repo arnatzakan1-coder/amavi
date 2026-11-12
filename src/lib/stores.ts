@@ -66,7 +66,7 @@ type DraftState = {
   reset: (defaults?: Partial<Omit<DraftState, "set" | "reset">>) => void;
 };
 
-const emptyDraft = { formulaId: null, name: "", eventSlug: null, eventChosen: false, concentrationPct: 20, items: [] as DraftItem[] };
+const emptyDraft = { formulaId: null, name: "", eventSlug: null, eventChosen: false, concentrationPct: 15, items: [] as DraftItem[] };
 
 export const useDraft = create<DraftState>()(
   persist(

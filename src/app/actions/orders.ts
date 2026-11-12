@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db, schema as s } from "@/db";
 import { currentUser } from "@/lib/session";
-import { getDeliveryMethods, getPaymentMethods, getPriceConfig } from "@/lib/data";
-import { getFormulasForUser, validateOnServer } from "@/lib/formulas";
+import { getConcentrations, getDeliveryMethods, getPaymentMethods, getPriceConfig } from "@/lib/data";
+import { getFormulasForUser, validateOnServer, pickConcentration } from "@/lib/formulas";
 import { priceOrder, PricingError, MAX_QTY } from "@/lib/pricing";
 import { normalizeKzPhone } from "@/lib/phone";
 import { ONLINE_PROVIDERS, isOnline, paymentAvailable } from "@/lib/payments";
@@ -59,6 +59,9 @@ export async function createOrder(input: unknown): Promise<OrderResult> {
     return { ok: false, error: issue?.path[0] === "consent" ? "CONSENT" : "INPUT", field: String(issue?.path.join(".") ?? "") };
   }
   const data = parsed.data;
+  // Lines added to the cart before a concentration was retired are moved to the current one.
+  const concs = await getConcentrations();
+  for (const l of data.lines) l.concentrationPct = pickConcentration(l.concentrationPct, concs);
 
   const phone = normalizeKzPhone(data.phone);
   if (!phone) return { ok: false, error: "PHONE", field: "phone" };

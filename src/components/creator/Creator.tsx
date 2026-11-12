@@ -74,7 +74,8 @@ export function Creator({ notes, rules, pairs, events, concentrations, volumes, 
     if (!hydrated || loadedInitial.current) return;
     loadedInitial.current = true;
     if (initial) {
-      draft.reset({ ...initial, eventChosen: true });
+      const pct = concentrations.some((c) => c.pct === initial.concentrationPct) ? initial.concentrationPct : defaultConc;
+      draft.reset({ ...initial, concentrationPct: pct, eventChosen: true });
     } else if (!concentrations.some((c) => c.pct === draft.concentrationPct)) {
       draft.set({ concentrationPct: defaultConc });
     }
@@ -286,6 +287,13 @@ export function Creator({ notes, rules, pairs, events, concentrations, volumes, 
             <Balance balance={result.familyBalance} />
           </div>
 
+          {concentrations.length <= 1 ? (
+          <div className="card p-5 sm:p-6">
+            <h2 className="text-2xl">{t.creator.concentration}</h2>
+            <p className="mt-2 font-display text-3xl text-champagne">{defaultConc}% <span className="text-lg text-cream/80">· Eau de Parfum</span></p>
+            <p className="text-xs text-muted mt-1">{t.creator.concentrationHint}</p>
+          </div>
+          ) : (
           <div className="card p-5 sm:p-6">
             <fieldset>
               <legend className="text-2xl font-display">{t.creator.concentration}</legend>
@@ -312,6 +320,7 @@ export function Creator({ notes, rules, pairs, events, concentrations, volumes, 
               </div>
             </fieldset>
           </div>
+          )}
 
           <div className="card p-5 sm:p-6 space-y-4">
             <div aria-live="polite">

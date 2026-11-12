@@ -62,7 +62,10 @@ export function CheckoutForm({
   const [pending, start] = useTransition();
 
   const lines = useMemo(
-    () => cart.items.filter((i) => volumes.includes(i.volumeMl) && concentrations.includes(i.concentrationPct)),
+    () =>
+      cart.items
+        .filter((i) => volumes.includes(i.volumeMl))
+        .map((i) => (concentrations.includes(i.concentrationPct) ? i : { ...i, concentrationPct: concentrations[0] })),
     [cart.items, volumes, concentrations],
   );
   const dm = delivery.find((d) => d.code === deliveryCode);

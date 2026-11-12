@@ -32,7 +32,7 @@ export default async function CheckoutPage() {
       <CheckoutForm
         config={config}
         volumes={volumes.map((v) => v.ml)}
-        concentrations={concs.map((c) => c.pct)}
+        concentrations={[...concs].sort((a, b) => Number(b.isDefault) - Number(a.isDefault)).map((c) => c.pct)}
         delivery={delivery.map((d) => ({ code: d.code, name: pick(d, "name", locale), priceKzt: d.priceKzt ?? 0, requiresAddress: d.requiresAddress }))}
         payments={payments.map((p) => ({ code: p.code, name: pick(p, "name", locale), available: paymentAvailable(p.code, p.active) }))}
         addresses={addresses.map((a) => ({
