@@ -49,7 +49,28 @@ export const enabledOAuth = {
   apple: Boolean(process.env.AUTH_APPLE_ID && process.env.AUTH_APPLE_SECRET),
 };
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+/** AUTH_SECRET from the environment, or — if the host has none set — a random secret
+ *  created once and kept in the database, so sign-in works without manual setup. */
+let cachedSecret: string | null = null;
+async function authSecret(): Promise<string> {
+  if (process.env.AUTH_SECRET) return process.env.AUTH_SECRET;
+  if (cachedSecret) return cachedSecret;
+  const read = async () => (await db.select().from(s.settings).where(eq(s.settings.key, "authSecret")))[0]?.value;
+  let secret = await read();
+  if (!secret) {
+    const bytes = crypto.getRandomValues(new Uint8Array(32));
+    const fresh = Buffer.from(bytes).toString("base64url");
+    await db.insert(s.settings).values({ key: "authSecret", value: fresh }).onConflictDoNothing();
+    secret = (await read()) ?? fresh; // another instance may have written first — use the stored one
+    console.warn("[amavi] AUTH_SECRET is not set; using a secret stored in the database");
+  }
+  cachedSecret = secret;
+  return secret;
+}
+
+export const { handlers, auth, signIn, signOut } = NextAuth(async () => ({
+  secret: await authSecret(),
+  trustHost: true,
   adapter: DrizzleAdapter(db, {
     usersTable: s.users,
     accountsTable: s.accounts,
@@ -83,4 +104,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
     },
   },
-});
+}));
