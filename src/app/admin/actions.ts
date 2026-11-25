@@ -382,3 +382,14 @@ export async function savePerfumer(form: FormData) {
   revalidatePath("/admin/perfumers");
   redirect("/admin/perfumers?saved=1");
 }
+
+// ───────── Users: temporary password (client forgot it; verify identity by phone first) ─────────
+export async function setUserPassword(form: FormData) {
+  await assertAdmin();
+  const id = str(form, "id");
+  const pw = str(form, "password");
+  if (pw.length < 8) redirect("/admin/users?error=short");
+  const bcrypt = (await import("bcryptjs")).default;
+  await db.update(s.users).set({ passwordHash: await bcrypt.hash(pw, 10) }).where(eq(s.users.id, id));
+  redirect("/admin/users?saved=1");
+}

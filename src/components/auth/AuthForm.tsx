@@ -105,6 +105,13 @@ export function AuthForm({ mode, next, oauth, registered = false }: { mode: "log
         </button>
         {mode === "register" && <p className="text-xs text-muted">{t.auth.consent}</p>}
       </form>
+      {mode === "login" && (
+        <details className="mt-4 text-sm">
+          <summary className="cursor-pointer text-champagne underline underline-offset-4 w-fit">{t.auth.forgot}</summary>
+          <p className="mt-2 text-muted">{t.auth.forgotText}</p>
+          <a href="https://wa.me/77765518509" target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm mt-3">WhatsApp</a>
+        </details>
+      )}
 
       <p className="mt-6 text-sm text-cream/75">
         {mode === "login" ? t.auth.noAccount : t.auth.haveAccount}{" "}

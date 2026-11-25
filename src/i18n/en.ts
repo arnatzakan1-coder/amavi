@@ -305,6 +305,8 @@ const en: Dict = {
     apple: "Continue with Apple",
     or: "or",
     invalid: "Wrong email or password.",
+    forgot: "Forgot your password?",
+    forgotText: "Message us on WhatsApp or call the studio from the number you booked with. An administrator will set a temporary password for you.",
     nameRequired: "Please enter your name.",
     emailInvalid: "Please check the email address — for example, name@gmail.com.",
     passwordShort: "The password must be at least 8 characters.",

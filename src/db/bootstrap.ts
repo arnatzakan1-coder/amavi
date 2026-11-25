@@ -8,6 +8,8 @@ import { eq, ne } from "drizzle-orm";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { db, schema as s } from "./index";
 import { runSeed } from "./seed";
+import bcrypt from "bcryptjs";
+import { isAdminEmail } from "@/lib/admin-email";
 import { BOOKING, BOUTIQUE, CONCENTRATION_PCT, PERFUMERS, PRICES } from "./studio-defaults";
 
 export async function bootstrap() {
@@ -30,6 +32,21 @@ export async function bootstrap() {
     console.log(`[amavi] database was empty — loaded ${n} notes and default settings`);
   }
   await applyDataUpdates();
+  await ownerPasswordReset();
+}
+
+// Recovery for a locked-out administrator: set OWNER_RESET_PASSWORD (8+ characters) in the
+// hosting environment and redeploy — every admin-email account gets that password.
+// Remove the variable afterwards.
+async function ownerPasswordReset() {
+  const pw = process.env.OWNER_RESET_PASSWORD;
+  if (!pw || pw.length < 8) return;
+  const hash = await bcrypt.hash(pw, 10);
+  const users = await db.select({ id: s.users.id, email: s.users.email }).from(s.users);
+  for (const u of users.filter((x) => isAdminEmail(x.email))) {
+    await db.update(s.users).set({ passwordHash: hash, role: "ADMIN" }).where(eq(s.users.id, u.id));
+  }
+  console.warn("[amavi] OWNER_RESET_PASSWORD applied — remove the variable now");
 }
 
 // ───────── One-time data updates for databases that already exist ─────────
