@@ -29,7 +29,7 @@ export default async function CollectionPage() {
       {items.length === 0 ? (
         <div className="mt-12 card p-10 sm:p-14 grid md:grid-cols-[1fr_auto] gap-8 items-center">
           <p className="font-display text-2xl sm:text-3xl text-cream/90 max-w-2xl">{t.collection.empty}</p>
-          <Link href="/create" className="btn btn-gold">{t.nav.create}</Link>
+          <Link href="/book" className="btn btn-gold">{t.nav.book}</Link>
         </div>
       ) : (
         <ul className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -60,7 +60,7 @@ export default async function CollectionPage() {
                     );
                   })}
                 </dl>
-                <Link href={`/create?from=${c.id}`} className="btn btn-ghost btn-sm mt-6">{t.collection.customize}</Link>
+                <Link href="/book" className="btn btn-ghost btn-sm mt-6">{t.collection.customize}</Link>
               </li>
             );
           })}

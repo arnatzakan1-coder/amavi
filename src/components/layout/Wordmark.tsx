@@ -1,8 +1,12 @@
-export function Wordmark({ className = "" }: { className?: string }) {
+// AMAVI wordmark set in the presentation's heading style (condensed caps, deep indigo).
+// When the official logo file is provided, place it at /public/logo.svg and swap it in here —
+// every page (header, footer, home, booking) uses this one component.
+export function Wordmark({ className = "", tone = "dark" }: { className?: string; tone?: "dark" | "light" }) {
   return (
-    <span className={`inline-flex flex-col items-start leading-none ${className}`}>
-      <span className="font-display text-[1.65rem] tracking-[0.32em] text-cream">AMAVI</span>
-      <span className="mt-1 text-[0.52rem] tracking-[0.42em] uppercase text-gold">Perfume Atelier</span>
+    <span
+      className={`font-display uppercase leading-none text-[1.7rem] tracking-[0.22em] font-medium ${tone === "light" ? "text-ink-2" : "text-cream"} ${className}`}
+    >
+      AMAVI
     </span>
   );
 }

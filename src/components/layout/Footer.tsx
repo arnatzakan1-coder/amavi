@@ -17,10 +17,10 @@ export async function Footer() {
         </div>
         <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
           {[
-            ["/create", t.nav.create],
-            ["/collection", t.nav.collection],
-            ["/match", t.nav.match],
+            ["/book", t.nav.book],
             ["/formulas", t.nav.formulas],
+            ["/collection", t.nav.collection],
+            ["/account", t.nav.account],
             ["/about", t.nav.about],
             ["/boutique", t.nav.boutique],
           ].map(([href, label]) => (
@@ -31,6 +31,7 @@ export async function Footer() {
         </nav>
         <address className="not-italic text-sm text-cream/75 space-y-2">
           <p>{pick(b, "address", locale)}</p>
+          {b.hours && <p>{t.boutique.hours}: {b.hours}, {t.boutique.daily}</p>}
           <p>
             <a href={`tel:${b.phone}`} className="hover:text-champagne">{phonePretty}</a>
           </p>

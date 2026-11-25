@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
-/* AMAVI design tokens — deep black, cream, champagne, muted gold. */
+/* AMAVI design tokens — lilac, cream and deep indigo from the AMAVI presentation.
+   Token names are kept from the first theme: "ink" = page/surfaces, "cream" = main text. */
 @theme {
-  --font-display: "Cormorant", "Times New Roman", serif;
+  --font-display: "Oswald", "Arial Narrow", sans-serif;
   --font-sans: "Montserrat Variable", "Helvetica Neue", Arial, sans-serif;
 
-  --color-ink: #0e0d0b;
-  --color-ink-2: #171512;
-  --color-ink-3: #24201b;
-  --color-line: #3a342c;
-  --color-cream: #f5efe4;
-  --color-cream-2: #ece2d1;
-  --color-sand: #d9ccb6;
-  --color-champagne: #e6d3ae;
-  --color-gold: #c4a46b;
-  --color-gold-deep: #8a6a33;
-  --color-muted: #b4a993;
-  --color-muted-dark: #6b6152;
-  --color-plum: #5b2a3c;
-  --color-danger: #e08a7e;
-  --color-danger-dark: #9c3426;
-  --color-ok: #a9c4a0;
+  --color-ink: #e2cbf6;        /* page background — lilac */
+  --color-ink-2: #fffde6;      /* cards — cream */
+  --color-ink-3: #efe3fa;      /* subtle fills, hover */
+  --color-line: #c7a9e5;       /* hairlines */
+  --color-cream: #2c0a71;      /* main text — deep indigo */
+  --color-cream-2: #3b1d84;
+  --color-sand: #4e3a80;
+  --color-champagne: #5e35a0;  /* accent text, selected states */
+  --color-gold: #6a3fa8;       /* eyebrows, icons */
+  --color-gold-deep: #4e3a80;
+  --color-muted: #5b4a86;      /* secondary text */
+  --color-muted-dark: #6b5a92;
+  --color-plum: #9b77be;
+  --color-violet: #9b77be;
+  --color-danger: #a02018;
+  --color-danger-dark: #8c1d18;
+  --color-ok: #24583a;
 
   --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
   --animate-fade-up: fade-up 0.9s var(--ease-luxe) both;
@@ -47,13 +49,14 @@
   }
   h1, h2, h3, .font-display {
     font-family: var(--font-display);
-    font-weight: 500;
-    letter-spacing: 0.005em;
-    line-height: 1.08;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.12;
+    text-transform: uppercase;
     text-wrap: balance;
   }
   p { text-wrap: pretty; }
-  ::selection { background: var(--color-gold); color: var(--color-ink); }
+  ::selection { background: var(--color-cream); color: var(--color-ink-2); }
   :focus-visible {
     outline: 2px solid var(--color-gold);
     outline-offset: 3px;
@@ -69,8 +72,8 @@
   @media (min-width: 768px) { .container-lux { padding-inline: 2rem; } }
 
   .eyebrow {
-    font-size: 0.72rem;
-    letter-spacing: 0.28em;
+    font-size: 0.74rem;
+    letter-spacing: 0.26em;
     text-transform: uppercase;
     color: var(--color-gold);
     font-weight: 500;
@@ -85,26 +88,28 @@
     white-space: nowrap;
   }
   .btn:active:not(:disabled) { transform: scale(0.98); }
+  @media (max-width: 420px) { .btn { white-space: normal; text-align: center; letter-spacing: 0.14em; line-height: 1.3; padding-block: 0.6rem; } }
   .btn:disabled { opacity: .45; }
-  .btn-gold { background: var(--color-champagne); color: var(--color-ink); }
-  .btn-gold:hover:not(:disabled) { background: var(--color-gold); }
-  .btn-ghost { border-color: color-mix(in oklab, var(--color-champagne) 45%, transparent); color: var(--color-cream); }
-  .btn-ghost:hover:not(:disabled) { border-color: var(--color-champagne); background: color-mix(in oklab, var(--color-champagne) 8%, transparent); }
-  .btn-dark { background: var(--color-ink); color: var(--color-cream); }
-  .btn-dark:hover:not(:disabled) { background: var(--color-ink-3); }
+  .btn-gold { background: var(--color-cream); color: var(--color-ink-2); }
+  .btn-gold:hover:not(:disabled) { background: var(--color-champagne); }
+  .btn-ghost { border-color: color-mix(in oklab, var(--color-cream) 45%, transparent); color: var(--color-cream); }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--color-cream); background: color-mix(in oklab, var(--color-ink-2) 55%, transparent); }
+  .btn-dark { background: var(--color-cream); color: var(--color-ink-2); }
+  .btn-dark:hover:not(:disabled) { background: var(--color-champagne); }
   .btn-sm { min-height: 40px; padding: 0 1rem; font-size: 0.7rem; }
 
   .card {
     background: var(--color-ink-2);
-    border: 1px solid var(--color-line);
+    border: 1px solid color-mix(in oklab, var(--color-line) 70%, transparent);
     border-radius: 18px;
+    box-shadow: 0 1px 2px rgb(44 10 113 / 0.04), 0 8px 24px -12px rgb(44 10 113 / 0.12);
   }
   .hairline { border-color: var(--color-line); }
 
   .field-label { display:block; font-size: 0.8rem; letter-spacing: .04em; color: var(--color-muted); margin-bottom: .4rem; }
   .field {
     width: 100%; min-height: 48px; padding: 0.7rem 0.95rem;
-    background: var(--color-ink); color: var(--color-cream);
+    background: #fff; color: var(--color-cream);
     border: 1px solid var(--color-line); border-radius: 12px;
     transition: border-color .2s;
   }
@@ -120,11 +125,19 @@
   }
 
   .gold-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--color-gold), transparent); }
+  .tabular { font-variant-numeric: tabular-nums; }
+  .slot-booked {
+    background: repeating-linear-gradient(135deg, var(--color-ink-3) 0 6px, color-mix(in oklab, var(--color-line) 60%, transparent) 6px 8px);
+    border: 1px solid var(--color-line);
+  }
 
   /* Cream section variant */
-  .section-cream { background: var(--color-cream); color: var(--color-ink); }
-  .section-cream .eyebrow { color: var(--color-gold-deep); }
-  .section-cream .text-soft { color: #4f473b; }
+  .section-cream { background: var(--color-ink-2); color: var(--color-cream); }
+  .section-cream .text-soft { color: var(--color-muted); }
+  /* Deep indigo band, like the closing slides */
+  .section-indigo { background: var(--color-cream); color: var(--color-ink-2); }
+  .section-indigo .eyebrow { color: var(--color-ink); }
+  .section-indigo .text-soft { color: color-mix(in oklab, var(--color-ink-2) 80%, transparent); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -7,7 +7,8 @@ import { requireUser } from "@/lib/session";
 import { db, schema as s } from "@/db";
 import { formatKzt } from "@/lib/pricing";
 import { signOutAction } from "@/app/actions/auth";
-import { AddressBook } from "@/components/account/AddressBook";
+import { MyBookings } from "@/components/account/MyBookings";
+import { utcToAlmaty, fmtHHMM } from "@/lib/booking";
 import { StatusBadge } from "@/components/account/StatusBadge";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -18,11 +19,23 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AccountPage() {
   const user = await requireUser("/account");
   const { t, locale } = await getI18n();
-  const [orders, addresses] = await Promise.all([
+  const [orders, bookings] = await Promise.all([
     db.select().from(s.orders).where(eq(s.orders.userId, user.id)).orderBy(desc(s.orders.createdAt)),
-    db.select().from(s.addresses).where(eq(s.addresses.userId, user.id)),
+    db
+      .select({ b: s.bookings, perfumer: s.perfumers.name })
+      .from(s.bookings)
+      .innerJoin(s.perfumers, eq(s.perfumers.id, s.bookings.perfumerId))
+      .where(eq(s.bookings.userId, user.id))
+      .orderBy(desc(s.bookings.startsAt)),
   ]);
   const dateLocale = locale === "en" ? "en-GB" : locale === "kk" ? "kk-KZ" : "ru-RU";
+  const now = Date.now();
+  const when = (ms: number) => {
+    const a = utcToAlmaty(ms);
+    const [y, m, d] = a.day.split("-").map(Number);
+    const date = new Date(Date.UTC(y, m - 1, d, 12)).toLocaleDateString(dateLocale, { timeZone: "UTC", weekday: "short", day: "numeric", month: "long" });
+    return `${date}, ${fmtHHMM(a.minutes)}`;
+  };
 
   return (
     <div className="container-lux py-10 sm:py-14">
@@ -34,14 +47,32 @@ export default async function AccountPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/formulas" className="btn btn-ghost btn-sm">{t.nav.formulas}</Link>
+          <Link href="/book" className="btn btn-gold btn-sm">{t.nav.book}</Link>
           {user.role === "ADMIN" && <Link href="/admin" className="btn btn-ghost btn-sm">{t.nav.admin}</Link>}
+          {(user.role === "ADMIN" || user.role === "PERFUMER") && <Link href="/studio" className="btn btn-ghost btn-sm">{t.nav.staff}</Link>}
           <form action={signOutAction}>
             <button className="btn btn-ghost btn-sm">{t.nav.logout}</button>
           </form>
         </div>
       </div>
 
-      <section className="mt-12" aria-labelledby="orders-h">
+      <section className="mt-12" aria-labelledby="bk-h">
+        <h2 id="bk-h" className="text-3xl">{t.booking.myBookings}</h2>
+        <MyBookings
+          bookings={bookings.map(({ b, perfumer }) => ({
+            id: b.id,
+            number: b.number,
+            when: when(+b.startsAt),
+            perfumer,
+            volumeMl: b.volumeMl,
+            status: b.status,
+            deposit: formatKzt(b.depositKzt, locale),
+            cancellable: +b.startsAt > now && (b.status === "PENDING_DEPOSIT" || b.status === "CONFIRMED"),
+          }))}
+        />
+      </section>
+
+      <section className="mt-14" aria-labelledby="orders-h">
         <h2 id="orders-h" className="text-3xl">{t.account.orders}</h2>
         {orders.length === 0 ? (
           <p className="mt-4 card p-6 text-cream/75">{t.account.noOrders}</p>
@@ -64,17 +95,6 @@ export default async function AccountPage() {
         )}
       </section>
 
-      <section className="mt-14" aria-labelledby="addr-h">
-        <h2 id="addr-h" className="text-3xl">{t.account.addresses}</h2>
-        <AddressBook
-          addresses={addresses.map((a) => ({
-            id: a.id,
-            label: `${a.firstName} ${a.lastName} · ${a.phone}`,
-            line: `${a.city}, ${a.street} ${a.house}${a.apartment ? `, ${a.apartment}` : ""}`,
-            isDefault: a.isDefault,
-          }))}
-        />
-      </section>
     </div>
   );
 }

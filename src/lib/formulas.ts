@@ -5,7 +5,7 @@ import { evaluate, withFixedNotes } from "./composition";
 import { getConcentrations, getNotes, getPairs, getSetting, toRule } from "./data";
 
 /** A concentration that is no longer offered (e.g. a formula saved at 20% after the shop
- *  switched to a single 15% option) is moved to the current default instead of failing. */
+ *  switched to a single 20% option) is moved to the current default instead of failing. */
 export function pickConcentration(pct: number, concs: { pct: number; isDefault: boolean }[]): number {
   if (concs.some((c) => c.pct === pct)) return pct;
   return concs.find((c) => c.isDefault)?.pct ?? concs[0]?.pct ?? pct;
@@ -25,10 +25,12 @@ export async function validateOnServer(items: { slug: string; parts: number; tie
   return { result, notes, items: fixed, concentrationPct };
 }
 
-export async function getFormulasForUser(userId: string, onlyIds?: string[]) {
-  const where = onlyIds?.length
-    ? and(eq(s.formulas.userId, userId), inArray(s.formulas.id, onlyIds))
-    : eq(s.formulas.userId, userId);
+/** STAFF / SERVER USE ONLY — returns ingredient lists. Never pass `items` to a customer page. */
+export async function getFormulasForUser(userId: string | null, onlyIds?: string[]) {
+  const conds = [];
+  if (userId) conds.push(eq(s.formulas.userId, userId));
+  if (onlyIds?.length) conds.push(inArray(s.formulas.id, onlyIds));
+  const where = conds.length ? and(...conds) : undefined;
   const rows = await db.select().from(s.formulas).where(where);
   if (rows.length === 0) return [];
   const items = await db

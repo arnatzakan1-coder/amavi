@@ -10,7 +10,7 @@ import { useCart, useHydrated } from "@/lib/stores";
 import { Wordmark } from "./Wordmark";
 import { signOutAction } from "@/app/actions/auth";
 
-type Props = { user: { name: string; role: "USER" | "ADMIN" } | null };
+type Props = { user: { name: string; role: "USER" | "PERFUMER" | "ADMIN" } | null };
 
 export function Header({ user }: Props) {
   const { t, locale } = useI18n();
@@ -36,12 +36,13 @@ export function Header({ user }: Props) {
   }, [open]);
 
   const links = [
-    { href: "/create", label: t.nav.create, compactOnly: true },
+    { href: "/book", label: t.nav.book, compactOnly: true },
+    { href: "/formulas", label: t.nav.formulas },
     { href: "/collection", label: t.nav.collection },
-    { href: "/match", label: t.nav.match },
     { href: "/about", label: t.nav.about },
     { href: "/boutique", label: t.nav.boutique },
   ];
+  const isStaff = user?.role === "ADMIN" || user?.role === "PERFUMER";
   const isActive = (href: string) => path === href || path.startsWith(href + "/");
 
   const LangSwitch = ({ className = "" }: { className?: string }) => (
@@ -55,7 +56,7 @@ export function Header({ user }: Props) {
           aria-pressed={l === locale}
           lang={l}
           className={`min-h-[40px] min-w-[44px] px-2 text-[0.72rem] tracking-[0.14em] uppercase rounded-full transition-colors ${
-            l === locale ? "text-ink bg-champagne" : "text-muted hover:text-cream"
+            l === locale ? "text-ink-2 bg-cream" : "text-muted hover:text-cream"
           }`}
         >
           {LOCALE_LABELS[l]}
@@ -83,7 +84,7 @@ export function Header({ user }: Props) {
               href={l.href}
               aria-current={isActive(l.href) ? "page" : undefined}
               className={`whitespace-nowrap text-[0.7rem] tracking-[0.16em] uppercase transition-colors ${
-                isActive(l.href) ? "text-champagne" : "text-cream/75 hover:text-cream"
+                isActive(l.href) ? "text-cream font-semibold underline underline-offset-8 decoration-2" : "text-cream/80 hover:text-cream"
               }`}
             >
               {l.label}
@@ -107,13 +108,18 @@ export function Header({ user }: Props) {
           >
             <ShoppingBag size={19} strokeWidth={1.5} aria-hidden />
             {hydrated && count > 0 && (
-              <span className="absolute top-1.5 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-champagne text-ink text-[10px] font-semibold grid place-items-center">
+              <span className="absolute top-1.5 right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-cream text-ink-2 text-[10px] font-semibold grid place-items-center">
                 {count}
               </span>
             )}
           </Link>
-          <Link href="/create" className="hidden xl:inline-flex btn btn-gold btn-sm ml-2">
-            {t.nav.create}
+          {isStaff && (
+            <Link href="/studio" className="hidden xl:inline-flex btn btn-ghost btn-sm ml-1">
+              {t.nav.staff}
+            </Link>
+          )}
+          <Link href="/book" className="hidden xl:inline-flex btn btn-gold btn-sm ml-2">
+            {t.nav.book}
           </Link>
           <button
             type="button"
@@ -132,19 +138,24 @@ export function Header({ user }: Props) {
       {open && (
         <div id="mobile-nav" className="xl:hidden fixed inset-x-0 top-[68px] bottom-0 bg-ink z-[45] overflow-y-auto animate-fade-up">
           <nav aria-label="Mobile" className="container-lux py-8 flex flex-col">
-            {[{ href: "/", label: t.nav.home }, ...links, { href: "/formulas", label: t.nav.formulas }, { href: user ? "/account" : "/login", label: user ? t.nav.account : t.nav.login }].map((l) => (
+            {[{ href: "/", label: t.nav.home }, ...links, { href: user ? "/account" : "/login", label: user ? t.nav.account : t.nav.login }].map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 aria-current={isActive(l.href) ? "page" : undefined}
-                className="font-display text-3xl py-3 border-b border-line text-cream hover:text-champagne"
+                className="font-display uppercase text-2xl py-3 border-b border-line text-cream hover:text-champagne"
               >
                 {l.label}
               </Link>
             ))}
             {user?.role === "ADMIN" && (
-              <Link href="/admin" className="font-display text-2xl py-3 border-b border-line text-gold">
+              <Link href="/admin" className="font-display uppercase text-xl py-3 border-b border-line text-gold">
                 {t.nav.admin}
+              </Link>
+            )}
+            {isStaff && (
+              <Link href="/studio" className="font-display uppercase text-xl py-3 border-b border-line text-gold">
+                {t.nav.staff}
               </Link>
             )}
             <LangSwitch className="mt-8" />

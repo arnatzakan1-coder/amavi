@@ -2,15 +2,15 @@
  * AMAVI seed.
  * Sources:
  *  - notes-source.json  ← finmodel sheet T2_Notes (30 notes, family, supplier, material, safety note)
- *  - prices             ← set by the team: 10 ml 9,990 ₸, 30 ml 21,990 ₸, gift set 3×10 ml 21,990 ₸
- *  - concentrations     ← finmodel Assumptions "conc": allowed 15 / 20 / 25 %, standard 20 %
- *  - courier Almaty     ← finmodel Assumptions "deliv": 1,500 ₸ (estimate)
- *  - boutique address   ← docx §4.1: Radostovets St. 165/1, Bostandyk District, Almaty
+ *  - prices, address, hours, concentration, booking, perfumers ← ./studio-defaults.ts
+ *    (AMAVI presentation, Nov 2026, and the IP financial model of 20.11.2026)
+ *  - orders are collected at the studio only (deck: "In-studio reorders only. No delivery.")
  * Everything not present in the files is seeded as an editable DRAFT and flagged in the admin panel.
  */
 import { eq } from "drizzle-orm";
 import notesSource from "./data/notes-source.json";
 import { db, schema as s } from "./index";
+import { BOOKING, BOUTIQUE, CONCENTRATION_PCT, PERFUMERS, PRICES } from "./studio-defaults";
 
 // Translated note names (EN name is from the file).
 const NAMES: Record<string, { ru: string; kk: string }> = {
@@ -101,28 +101,11 @@ const SETTINGS: Record<string, unknown> = {
     minNotesPerTier: 1,
     verified: false,
   },
-  giftSet: {
-    // docx §4.1: gift set of three 10 ml perfumes — 26,900 ₸ (vs 29,700 ₸ separately).
-    enabled: true,
-    bottles: 3,
-    volumeMl: 10,
-    priceKzt: 21990,
-  },
-  boutique: {
-    addressRu: "ул. Радостовца, 165/1, Бостандыкский район, Алматы",
-    addressKk: "Радостовец к-сі, 165/1, Бостандық ауданы, Алматы",
-    addressEn: "165/1 Radostovets St., Bostandyk District, Almaty",
-    areaM2: null,
-    // Coordinates and the exact 2GIS card are not in the files → fill in the admin panel.
-    lat: null,
-    lon: null,
-    twoGisUrl: "https://2gis.kz/almaty/search/" + encodeURIComponent("Радостовца 165/1"),
-    hours: null,
-    phone: "+77765518509",
-    whatsapp: "77765518509",
-    listingUrl: "https://krisha.kz/a/show/1016465325",
-    leaseSigned: false,
-  },
+  // The 3×10 ml set is not part of the current offer.
+  giftSet: { enabled: false, bottles: 3, volumeMl: 10, priceKzt: 0 },
+  boutique: BOUTIQUE,
+  booking: BOOKING,
+  dataVersion: 3,
 };
 
 async function upsertSetting(key: string, value: unknown) {
@@ -160,21 +143,15 @@ export async function runSeed() {
       .onConflictDoNothing();
   }
 
-  await db.insert(s.volumes).values([
-    { ml: 10, priceKzt: 9990, sortOrder: 0 },
-    { ml: 30, priceKzt: 21990, sortOrder: 1 },
-  ]).onConflictDoNothing();
+  await db.insert(s.volumes).values(PRICES.map((p, i) => ({ ...p, sortOrder: i }))).onConflictDoNothing();
 
   await db.insert(s.concentrations).values(
-    // One fixed concentration: 15% (Eau de Parfum). The finmodel allows 15–25%; the team chose 15%.
-    [15].map((pct) => ({ pct, isDefault: true, surchargeKzt: 0 })),
+    // One fixed concentration: 20% perfume concentrate (IP model, Nov 2026).
+    [CONCENTRATION_PCT].map((pct) => ({ pct, isDefault: true, surchargeKzt: 0 })),
   ).onConflictDoNothing();
 
   const delivery = [
-    { code: "pickup", ru: "Самовывоз из бутика", kk: "Бутиктен алып кету", en: "Pick up at the boutique", price: 0, addr: false },
-    { code: "courier_almaty", ru: "Курьер по Алматы", kk: "Алматы бойынша курьер", en: "Courier in Almaty", price: 1500, addr: true },
-    // Price for other cities is not in the files → null = hidden until the admin sets it.
-    { code: "kz_cities", ru: "Доставка по Казахстану (Астана и др.)", kk: "Қазақстан бойынша жеткізу (Астана, т.б.)", en: "Delivery across Kazakhstan (Astana etc.)", price: null, addr: true },
+    { code: "pickup", ru: "Самовывоз из студии", kk: "Студиядан алып кету", en: "Pick up at the studio", price: 0, addr: false },
   ];
   await db.insert(s.deliveryMethods).values(
     delivery.map((d, i) => ({ code: d.code, nameRu: d.ru, nameKk: d.kk, nameEn: d.en, priceKzt: d.price, requiresAddress: d.addr, sortOrder: i })),
@@ -186,13 +163,17 @@ export async function runSeed() {
     { code: "card", ru: "Банковская карта Visa / Mastercard", kk: "Visa / Mastercard банк картасы", en: "Visa / Mastercard card" },
     // Manual: a manager sends a Kaspi Pay invoice to the customer's phone after confirming the order.
     { code: "kaspi_invoice", ru: "Kaspi: счёт на номер телефона", kk: "Kaspi: телефон нөміріне шот", en: "Kaspi: invoice to your phone" },
-    { code: "boutique", ru: "Оплата в бутике при получении", kk: "Бутикте алған кезде төлеу", en: "Pay at the boutique on pickup" },
+    { code: "boutique", ru: "Оплата в студии при получении", kk: "Студияда алған кезде төлеу", en: "Pay at the studio on pickup" },
   ];
   await db.insert(s.paymentMethods).values(
     payments.map((p, i) => ({ code: p.code, nameRu: p.ru, nameKk: p.kk, nameEn: p.en, sortOrder: i })),
   ).onConflictDoNothing();
 
   for (const [key, value] of Object.entries(SETTINGS)) await upsertSetting(key, value);
+
+  if ((await db.select().from(s.perfumers).limit(1)).length === 0) {
+    await db.insert(s.perfumers).values(PERFUMERS);
+  }
 
   const niche = await db.select().from(s.nicheFragrances).limit(1);
   if (niche.length === 0) {

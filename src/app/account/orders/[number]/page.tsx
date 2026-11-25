@@ -58,7 +58,7 @@ export default async function OrderPage({ params }: { params: Promise<{ number: 
           </ul>
           <dl className="mt-4 space-y-2 text-sm border-t border-line pt-4">
             <div className="flex justify-between"><dt className="text-muted">{t.cart.subtotal}</dt><dd>{formatKzt(order.subtotalKzt, locale)}</dd></div>
-            {order.discountKzt > 0 && <div className="flex justify-between text-ok"><dt>{t.home.giftSet}</dt><dd>−{formatKzt(order.discountKzt, locale)}</dd></div>}
+            {order.discountKzt > 0 && <div className="flex justify-between text-ok"><dt>{t.cart.subtotal}</dt><dd>−{formatKzt(order.discountKzt, locale)}</dd></div>}
             <div className="flex justify-between"><dt className="text-muted">{t.cart.delivery}</dt><dd>{formatKzt(order.deliveryFeeKzt, locale)}</dd></div>
             <div className="flex justify-between font-display text-2xl pt-2"><dt>{t.cart.total}</dt><dd className="text-champagne">{formatKzt(order.totalKzt, locale)}</dd></div>
           </dl>

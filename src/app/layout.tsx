@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource/cormorant/400.css";
-import "@fontsource/cormorant/500.css";
-import "@fontsource/cormorant/600.css";
-import "@fontsource/cormorant/400-italic.css";
+import "@fontsource/oswald/300.css";
+import "@fontsource/oswald/400.css";
+import "@fontsource/oswald/500.css";
 import "@fontsource-variable/montserrat/wght.css";
 import "./globals.css";
 import { getI18n } from "@/i18n/server";
@@ -21,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0e0d0b",
+  themeColor: "#e2cbf6",
   width: "device-width",
   initialScale: 1,
 };

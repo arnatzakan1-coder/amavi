@@ -7,7 +7,7 @@ export default async function AdminBoutique({ searchParams }: { searchParams: Pr
   const b = await getSetting("boutique");
   return (
     <>
-      <H1 sub="Адрес из документа AMAVI: ул. Радостовца 165/1, Бостандыкский район. Объявление krisha.kz автоматически не читается — координаты и ссылку на карточку 2GIS укажите вручную.">Бутик и 2GIS</H1>
+      <H1 sub="Адрес студии: ул. Желтоксан, 155 (Алмалинский район), режим работы 10:00–21:00 ежедневно. Координаты для метки на карте и ссылку на карточку 2GIS укажите вручную.">Студия и 2GIS</H1>
       <Saved show={sp.saved === "1"} />
       <form action={updateBoutique} className="card p-6 grid gap-5 md:grid-cols-2">
         <Input className="md:col-span-2" label="Адрес (рус)" name="addressRu" defaultValue={b.addressRu} required />

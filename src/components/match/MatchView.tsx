@@ -56,12 +56,12 @@ export function MatchView({
           <legend className="font-display text-2xl">{t.match.chooseFormula}</legend>
           <div className="mt-3 grid gap-2">
             <label className={`flex items-center gap-3 rounded-xl border px-3 py-3 cursor-pointer ${source === "draft" ? "border-champagne" : "border-line"}`}>
-              <input type="radio" name="src" className="accent-[#e6d3ae]" checked={source === "draft"} onChange={() => setSource("draft")} />
+              <input type="radio" name="src" className="accent-[#2c0a71]" checked={source === "draft"} onChange={() => setSource("draft")} />
               <span className="text-sm">{t.match.useCurrent}{draft.name ? ` — ${draft.name}` : ""}</span>
             </label>
             {formulas.map((f) => (
               <label key={f.id} className={`flex items-center gap-3 rounded-xl border px-3 py-3 cursor-pointer ${source === f.id ? "border-champagne" : "border-line"}`}>
-                <input type="radio" name="src" className="accent-[#e6d3ae]" checked={source === f.id} onChange={() => setSource(f.id)} />
+                <input type="radio" name="src" className="accent-[#2c0a71]" checked={source === f.id} onChange={() => setSource(f.id)} />
                 <span className="text-sm truncate">{f.name}</span>
               </label>
             ))}

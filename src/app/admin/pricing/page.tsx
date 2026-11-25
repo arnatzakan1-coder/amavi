@@ -16,7 +16,7 @@ export default async function AdminPricing({ searchParams }: { searchParams: Pro
   ]);
   return (
     <>
-      <H1 sub="Цены задала команда (10 мл — 9 990 ₸, 30 мл — 21 990 ₸, набор 3×10 мл — 21 990 ₸), доставка — из финмодели (курьер по Алматы — 1 500 ₸, оценка). Итоговая цена всегда считается на сервере.">Цены, объёмы и доставка</H1>
+      <H1 sub="Цены из презентации AMAVI: 10 мл — 24 000 ₸, 30 мл — 45 000 ₸ (консультация включена). Концентрат — 20 %. Готовые флаконы выдаются только в студии; доставка отключена. Итоговая цена всегда считается на сервере.">Цены и получение</H1>
       <Saved show={sp.saved === "1"} />
       <form action={updatePricing} className="space-y-6">
         <section className="card p-6">
@@ -46,7 +46,7 @@ export default async function AdminPricing({ searchParams }: { searchParams: Pro
               <div key={c.id} className="grid grid-cols-[80px_1fr_auto_auto] gap-3 items-center">
                 <span className="font-display text-2xl">{c.pct}%</span>
                 <input name={`conc_${c.id}`} type="number" min={0} defaultValue={c.surchargeKzt} className="field" aria-label={`Доплата за ${c.pct}%`} />
-                <label className="flex items-center gap-2 text-sm"><input type="radio" name="conc_default" value={c.id} defaultChecked={c.isDefault} className="accent-[#e6d3ae]" /> по умолчанию</label>
+                <label className="flex items-center gap-2 text-sm"><input type="radio" name="conc_default" value={c.id} defaultChecked={c.isDefault} className="accent-[#2c0a71]" /> по умолчанию</label>
                 <Check label="Доступна" name={`conc_active_${c.id}`} defaultChecked={c.active} />
               </div>
             ))}

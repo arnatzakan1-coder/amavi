@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { MapPin, Phone, Clock, Navigation, ExternalLink } from "lucide-react";
 import { getI18n } from "@/i18n/server";
 import { pick } from "@/i18n";
@@ -36,7 +37,10 @@ export default async function BoutiquePage() {
       <p className="eyebrow">AMAVI Studio</p>
       <h1 className="mt-3 text-4xl sm:text-6xl">{t.boutique.title}</h1>
       <p className="mt-4 text-cream/75 max-w-2xl">{t.boutique.subtitle}</p>
-      {!b.leaseSigned && <p className="chip mt-5 text-champagne border-gold/50">{t.boutique.openingSoon}</p>}
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <Link href="/book" className="btn btn-gold btn-sm">{t.home.ctaBook}</Link>
+        {!b.leaseSigned && <p className="chip text-champagne border-gold/50">{t.boutique.openingSoon}</p>}
+      </div>
 
       <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_1.3fr]">
         <section className="card p-6 sm:p-8 space-y-7">
@@ -51,7 +55,7 @@ export default async function BoutiquePage() {
             <Clock className="text-gold shrink-0 mt-1" size={20} aria-hidden />
             <div>
               <h2 className="font-sans text-xs uppercase tracking-[0.2em] text-muted">{t.boutique.hours}</h2>
-              <p className="mt-1">{b.hours ?? <span className="text-muted">{t.common.pending}</span>}</p>
+              <p className="mt-1">{b.hours ? `${b.hours}, ${t.boutique.daily}` : <span className="text-muted">{t.common.pending}</span>}</p>
             </div>
           </div>
           <div className="flex gap-4">
@@ -73,7 +77,7 @@ export default async function BoutiquePage() {
           {mapKey && hasCoords ? (
             <TwoGisMap apiKey={mapKey} lat={b.lat!} lon={b.lon!} label="AMAVI" />
           ) : (
-            <div className="absolute inset-0 grid place-items-center p-8 text-center" style={{ background: "repeating-linear-gradient(45deg, #171512 0 22px, #1b1915 22px 44px)" }}>
+            <div className="absolute inset-0 grid place-items-center p-8 text-center" style={{ background: "repeating-linear-gradient(45deg, #efe3fa 0 22px, #e8d8f8 22px 44px)" }}>
               <div>
                 <MapPin className="mx-auto text-gold" size={34} aria-hidden />
                 <p className="mt-4 font-display text-2xl">{address}</p>

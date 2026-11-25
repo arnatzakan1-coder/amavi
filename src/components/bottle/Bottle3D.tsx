@@ -20,21 +20,22 @@ function useLabelTexture(text: string) {
     c.width = 512;
     c.height = 640;
     const g = c.getContext("2d")!;
-    g.fillStyle = "#f3ebdd";
+    g.fillStyle = "#fffde6";
     g.fillRect(0, 0, c.width, c.height);
-    g.strokeStyle = "#b8955a";
+    g.strokeStyle = "#9b77be";
     g.lineWidth = 3;
     g.strokeRect(22, 22, c.width - 44, c.height - 44);
-    g.fillStyle = "#1a1612";
+    g.fillStyle = "#2c0a71";
     g.textAlign = "center";
-    g.font = "500 92px Cormorant, 'Times New Roman', serif";
+    g.font = "500 96px Oswald, 'Arial Narrow', sans-serif";
     g.fillText("AMAVI", c.width / 2, 250);
-    g.fillStyle = "#8a6a33";
+    g.fillStyle = "#6a3fa8";
     g.font = "500 24px 'Montserrat Variable', Arial, sans-serif";
     g.fillText("E A U   D E   P A R F U M", c.width / 2, 310);
-    g.fillStyle = "#3a3229";
-    g.font = "italic 400 44px Cormorant, 'Times New Roman', serif";
-    const name = text.length > 22 ? text.slice(0, 21) + "…" : text;
+    g.fillStyle = "#2c0a71";
+    g.font = "400 40px Oswald, 'Arial Narrow', sans-serif";
+    const t = text.toUpperCase();
+    const name = t.length > 22 ? t.slice(0, 21) + "…" : t;
     g.fillText(name, c.width / 2, 450);
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
@@ -93,11 +94,11 @@ function Flacon({ liquidColor, fill = 0.72, label = "Signature", autoRotate = tr
       {/* Neck */}
       <mesh position={[0, H / 2 + 0.06, 0]}>
         <cylinderGeometry args={[0.15, 0.17, 0.12, 40]} />
-        <meshStandardMaterial color="#d8b878" metalness={1} roughness={0.3} />
+        <meshStandardMaterial color="#d9d0e6" metalness={1} roughness={0.3} />
       </mesh>
       {/* Gold cap */}
       <RoundedBox args={[0.62, 0.66, 0.5]} radius={0.05} smoothness={4} position={[0, H / 2 + 0.45, 0]}>
-        <meshStandardMaterial color="#d8b878" metalness={0.95} roughness={0.26} envMapIntensity={1.4} />
+        <meshStandardMaterial color="#d9d0e6" metalness={0.95} roughness={0.26} envMapIntensity={1.4} />
       </RoundedBox>
     </group>
   );
@@ -122,16 +123,16 @@ export default function Bottle3D(props: Props) {
     >
       <ambientLight intensity={0.35} />
       <directionalLight position={[3, 5, 4]} intensity={1.4} color="#fff3dc" />
-      <directionalLight position={[-4, 2, -3]} intensity={0.6} color="#c9a86a" />
+      <directionalLight position={[-4, 2, -3]} intensity={0.6} color="#c7a9e5" />
       <group position={[0, -0.25, 0]}>
         <Flacon {...props} autoRotate={(props.autoRotate ?? true) && !reduced} />
       </group>
-      <ContactShadows position={[0, -1.4, 0]} opacity={0.55} scale={6} blur={2.6} far={2} color="#000000" />
+      <ContactShadows position={[0, -1.4, 0]} opacity={0.35} scale={6} blur={2.6} far={2} color="#2c0a71" />
       <Environment resolution={128}>
         <Lightformer form="rect" intensity={3} color="#fff4e0" position={[0, 3, 3]} scale={[6, 2, 1]} />
-        <Lightformer form="rect" intensity={1.2} color="#e6d3ae" position={[-4, 1, 0]} rotation-y={Math.PI / 2} scale={[3, 4, 1]} />
+        <Lightformer form="rect" intensity={1.2} color="#e2cbf6" position={[-4, 1, 0]} rotation-y={Math.PI / 2} scale={[3, 4, 1]} />
         <Lightformer form="rect" intensity={1} color="#ffffff" position={[4, 0.5, -1]} rotation-y={-Math.PI / 2} scale={[3, 3, 1]} />
-        <Lightformer form="ring" intensity={0.8} color="#c4a46b" position={[0, -2, -4]} scale={3} />
+        <Lightformer form="ring" intensity={0.8} color="#9b77be" position={[0, -2, -4]} scale={3} />
       </Environment>
       {props.interactive && (
         <OrbitControls enablePan={false} enableZoom={false} minPolarAngle={Math.PI / 3} maxPolarAngle={Math.PI / 1.8} rotateSpeed={0.6} />

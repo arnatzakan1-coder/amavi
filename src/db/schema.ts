@@ -34,7 +34,8 @@ export const users = sqliteTable("user", {
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
   passwordHash: text("password_hash"),
-  role: text("role", { enum: ["USER", "ADMIN"] }).notNull().default("USER"),
+  role: text("role", { enum: ["USER", "PERFUMER", "ADMIN"] }).notNull().default("USER"),
+  phone: text("phone"),
   locale: text("locale").notNull().default("ru"),
   createdAt: createdAt(),
 });
@@ -188,6 +189,9 @@ export const formulas = sqliteTable(
       .references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     eventSlug: text("event_slug"),
+    // Formulas are AMAVI's IP: created by a perfumer in the studio, never shown to the customer.
+    createdById: text("created_by_id"),
+    bookingId: text("booking_id"),
     concentrationPct: integer("concentration_pct").notNull().default(20),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
@@ -322,7 +326,60 @@ export const nicheFragrances = sqliteTable("niche_fragrance", {
   active: integer("active", { mode: "boolean" }).notNull().default(true),
 });
 
+// ───────── Studio: perfumers, schedules, bookings ─────────
+
+/** One of AMAVI's perfumer-consultants. Name and schedule are edited in the admin panel. */
+export const perfumers = sqliteTable("perfumer", {
+  id: id(),
+  name: text("name").notNull(),
+  bioRu: text("bio_ru"),
+  bioKk: text("bio_kk"),
+  bioEn: text("bio_en"),
+  userId: text("user_id"), // staff account linked to this perfumer (sees their bookings)
+  workDays: text("work_days").notNull().default("1,2,3,4,5,6,7"), // ISO weekdays, 1 = Monday
+  startTime: text("start_time").notNull().default("10:00"),
+  endTime: text("end_time").notNull().default("21:00"),
+  daysOff: text("days_off").notNull().default(""), // comma-separated YYYY-MM-DD
+  sortOrder: integer("sort_order").notNull().default(0),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
+  nameVerified: integer("name_verified", { mode: "boolean" }).notNull().default(false),
+});
+
+/** A consultation booking. The partial unique index means a perfumer's time slot can be
+ *  held by only one active booking; cancelling frees it. */
+export const bookings = sqliteTable(
+  "booking",
+  {
+    id: id(),
+    number: text("number").notNull().unique(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    perfumerId: text("perfumer_id")
+      .notNull()
+      .references(() => perfumers.id),
+    startsAt: integer("starts_at", { mode: "timestamp_ms" }).notNull(),
+    durationMin: integer("duration_min").notNull(),
+    status: text("status").notNull().default("PENDING_DEPOSIT"), // PENDING_DEPOSIT | CONFIRMED | COMPLETED | CANCELLED | NO_SHOW
+    volumeMl: integer("volume_ml").notNull(),
+    depositKzt: integer("deposit_kzt").notNull(),
+    contactName: text("contact_name").notNull(),
+    contactPhone: text("contact_phone").notNull(),
+    questionnaireJson: text("questionnaire_json").notNull(),
+    staffNote: text("staff_note"),
+    consentAt: integer("consent_at", { mode: "timestamp_ms" }).notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    uniqueIndex("booking_slot_uq").on(t.perfumerId, t.startsAt).where(sql`status <> 'CANCELLED'`),
+    index("booking_user_idx").on(t.userId),
+  ],
+);
+
 export type Note = typeof notes.$inferSelect;
+export type Perfumer = typeof perfumers.$inferSelect;
+export type Booking = typeof bookings.$inferSelect;
 export type EventCategory = typeof eventCategories.$inferSelect;
 export type Volume = typeof volumes.$inferSelect;
 export type Concentration = typeof concentrations.$inferSelect;

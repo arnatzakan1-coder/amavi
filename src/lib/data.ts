@@ -3,6 +3,7 @@ import { asc, eq } from "drizzle-orm";
 import { db, schema as s } from "@/db";
 import type { CompositionRules, NoteRule, Pair } from "./composition";
 import type { PriceConfig } from "./pricing";
+import { BOOKING } from "@/db/studio-defaults";
 
 export type Boutique = {
   addressRu: string;
@@ -20,10 +21,12 @@ export type Boutique = {
 };
 
 export type GiftSet = { enabled: boolean; bottles: number; volumeMl: number; priceKzt: number };
+export type BookingSettings = typeof BOOKING;
 
 const DEFAULTS = {
   rules: { maxNotes: 10, minNotesPerTier: 1, verified: false } as CompositionRules,
   giftSet: { enabled: false, bottles: 3, volumeMl: 10, priceKzt: 0 } as GiftSet,
+  booking: BOOKING as BookingSettings,
   boutique: {
     addressRu: "", addressKk: "", addressEn: "", areaM2: null, lat: null, lon: null,
     twoGisUrl: null, hours: null, phone: "+77765518509", whatsapp: "77765518509", listingUrl: null, leaseSigned: false,
@@ -112,4 +115,9 @@ export async function getCreatorData() {
     getConcentrations(),
   ]);
   return { notes, rules, pairs, events, concentrations };
+}
+
+export async function getPerfumers(activeOnly = true) {
+  const rows = await db.select().from(s.perfumers).orderBy(asc(s.perfumers.sortOrder));
+  return activeOnly ? rows.filter((p) => p.active) : rows;
 }

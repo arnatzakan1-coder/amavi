@@ -46,7 +46,7 @@ export default async function AboutPage() {
           {t.about.why.map((w, i) => (
             <Reveal key={i} delay={i * 0.06}>
               <li className="flex gap-6 border-b border-line pb-6 list-none">
-                <span className="font-display text-3xl text-gold/80 w-10 shrink-0">0{i + 1}</span>
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-cream font-display text-xl">{i + 1}</span>
                 <p className="text-cream/80 text-lg">{w}</p>
               </li>
             </Reveal>
@@ -78,7 +78,7 @@ export default async function AboutPage() {
             <li key={n} className="chip text-cream/85 text-sm py-1.5 px-4">{n}</li>
           ))}
         </ul>
-        <Link href="/create" className="btn btn-gold mt-12">{t.home.ctaCreate}</Link>
+        <Link href="/book" className="btn btn-gold mt-12">{t.home.ctaBook}</Link>
       </section>
     </>
   );

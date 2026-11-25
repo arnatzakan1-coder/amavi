@@ -334,8 +334,51 @@ export async function deleteCollection(form: FormData) {
 export async function setUserRole(form: FormData) {
   const me = await assertAdmin();
   const id = str(form, "id");
-  const role = str(form, "role") === "ADMIN" ? "ADMIN" : "USER";
+  const r = str(form, "role");
+  const role = r === "ADMIN" ? "ADMIN" : r === "PERFUMER" ? "PERFUMER" : "USER";
   if (id === me.id && role !== "ADMIN") redirect("/admin/users"); // cannot demote yourself
   await db.update(s.users).set({ role }).where(and(eq(s.users.id, id)));
   redirect("/admin/users?saved=1");
+}
+
+// ───────── Perfumers & schedule ─────────
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+export async function savePerfumer(form: FormData) {
+  await assertAdmin();
+  const id = str(form, "id");
+  const name = str(form, "name").slice(0, 60);
+  const days = [1, 2, 3, 4, 5, 6, 7].filter((d) => bool(form, `d${d}`)).join(",");
+  const startTime = HHMM.test(str(form, "startTime")) ? str(form, "startTime") : "10:00";
+  const endTime = HHMM.test(str(form, "endTime")) ? str(form, "endTime") : "21:00";
+  const daysOff = str(form, "daysOff")
+    .split(/[\s,;]+/)
+    .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
+    .join(",");
+  const email = str(form, "email").toLowerCase();
+  let userId: string | null = null;
+  if (email) {
+    const [u] = await db.select({ id: s.users.id, role: s.users.role }).from(s.users).where(eq(s.users.email, email));
+    if (!u) redirect(`/admin/perfumers?error=email`);
+    userId = u.id;
+    if (u.role === "USER") await db.update(s.users).set({ role: "PERFUMER" }).where(eq(s.users.id, u.id));
+  }
+  const values = {
+    name: name || "Парфюмер",
+    bioRu: optStr(form, "bioRu"),
+    bioKk: optStr(form, "bioKk"),
+    bioEn: optStr(form, "bioEn"),
+    userId,
+    workDays: days,
+    startTime,
+    endTime,
+    daysOff,
+    sortOrder: Math.round(num(form, "sortOrder") ?? 0),
+    active: bool(form, "active"),
+    nameVerified: bool(form, "nameVerified"),
+  };
+  if (id) await db.update(s.perfumers).set(values).where(eq(s.perfumers.id, id));
+  else await db.insert(s.perfumers).values(values);
+  revalidatePath("/book");
+  revalidatePath("/admin/perfumers");
+  redirect("/admin/perfumers?saved=1");
 }

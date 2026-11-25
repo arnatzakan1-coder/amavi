@@ -46,7 +46,7 @@ export function Textarea({ label, name, defaultValue, rows = 3, hint, className 
 export function Check({ label, name, defaultChecked }: { label: string; name: string; defaultChecked?: boolean }) {
   return (
     <label className="flex items-center gap-2.5 text-sm cursor-pointer min-h-[40px]">
-      <input type="checkbox" name={name} defaultChecked={defaultChecked} className="h-4 w-4 accent-[#e6d3ae]" />
+      <input type="checkbox" name={name} defaultChecked={defaultChecked} className="h-4 w-4 accent-[#2c0a71]" />
       {label}
     </label>
   );

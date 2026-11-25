@@ -7,15 +7,18 @@ export const dynamic = "force-dynamic";
 
 const NAV = [
   ["/admin", "Обзор"],
+  ["/studio/bookings", "Записи (студия)"],
+  ["/studio/formulas", "Формулы клиентов"],
+  ["/admin/perfumers", "Парфюмеры и график"],
   ["/admin/orders", "Заказы"],
   ["/admin/inquiries", "Заявки"],
   ["/admin/notes", "Ноты (30)"],
   ["/admin/rules", "Правила формул"],
-  ["/admin/pricing", "Цены и доставка"],
+  ["/admin/pricing", "Цены и получение"],
   ["/admin/events", "События"],
   ["/admin/collection", "Коллекция AMAVI"],
   ["/admin/niche", "Нишевые ароматы"],
-  ["/admin/boutique", "Бутик и 2GIS"],
+  ["/admin/boutique", "Студия и 2GIS"],
   ["/admin/users", "Пользователи"],
 ];
 
@@ -28,7 +31,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <p className="mt-2 text-xs text-muted truncate">{admin.email}</p>
         <nav aria-label="Админ" className="mt-5 flex lg:flex-col gap-1 overflow-x-auto pb-2">
           {NAV.map(([href, label]) => (
-            <Link key={href} href={href} className="whitespace-nowrap rounded-lg px-3 py-2.5 text-sm text-cream/80 hover:bg-ink-3 hover:text-cream">
+            <Link key={href} href={href} className="whitespace-nowrap rounded-lg px-3 py-2.5 text-sm text-cream/80 hover:bg-ink-2 hover:text-cream">
               {label}
             </Link>
           ))}

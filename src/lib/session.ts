@@ -30,3 +30,19 @@ export async function assertAdmin() {
   if (!u || u.role !== "ADMIN") throw new Error("FORBIDDEN");
   return u;
 }
+
+export const isStaffRole = (role: string | null | undefined) => role === "ADMIN" || role === "PERFUMER";
+
+/** Perfumers and administrators: bookings, client questionnaires and formulas. */
+export async function requireStaff(next = "/admin") {
+  const u = await currentUser();
+  if (!u) redirect(`/login?next=${encodeURIComponent(next)}`);
+  if (!isStaffRole(u.role)) redirect("/");
+  return u;
+}
+
+export async function assertStaff() {
+  const u = await currentUser();
+  if (!u || !isStaffRole(u.role)) throw new Error("FORBIDDEN");
+  return u;
+}

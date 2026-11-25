@@ -13,7 +13,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { AlertCircle, CheckCircle2, Info, RotateCcw, Sparkles } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info, Lock, RotateCcw, Sparkles } from "lucide-react";
 import { useI18n } from "@/i18n/client";
 import { fmt } from "@/i18n";
 import { useCart, useDraft, useHydrated, type DraftItem } from "@/lib/stores";
@@ -47,11 +47,13 @@ type Props = {
   volumes: { ml: number; priceKzt: number }[];
   loggedIn: boolean;
   initial: { formulaId: string | null; name: string; eventSlug: string | null; concentrationPct: number; items: DraftItem[] } | null;
+  /** Studio context: the booking whose client the new formula belongs to. */
+  staff?: { bookingId: string | null; client: string | null };
 };
 
 const DEFAULT_PARTS = 3;
 
-export function Creator({ notes, rules, pairs, events, concentrations, volumes, loggedIn, initial }: Props) {
+export function Creator({ notes, rules, pairs, events, concentrations, volumes, loggedIn, initial, staff }: Props) {
   const { t, locale } = useI18n();
   const router = useRouter();
   const hydrated = useHydrated();
@@ -146,8 +148,13 @@ export function Creator({ notes, rules, pairs, events, concentrations, volumes, 
       return null;
     }
     const name = draft.name.trim() || "AMAVI Signature";
+    if (!draft.formulaId && !staff?.bookingId) {
+      setSaveState({ kind: "error", msg: t.creator.noClient });
+      return null;
+    }
     const res = await saveFormula({
       id: draft.formulaId,
+      bookingId: staff?.bookingId ?? null,
       name,
       eventSlug: draft.eventSlug,
       concentrationPct: draft.concentrationPct,
@@ -158,7 +165,8 @@ export function Creator({ notes, rules, pairs, events, concentrations, volumes, 
       setSaveState({ kind: "saved" });
       return res.id;
     }
-    if (res.reason === "RULES") setSaveState({ kind: "error", msg: res.errors.map((e) => validationMessage(e, t, nameOf)).join(" ") });
+    if (res.reason === "NO_CLIENT") setSaveState({ kind: "error", msg: t.creator.noClient });
+    else if (res.reason === "RULES") setSaveState({ kind: "error", msg: res.errors.map((e) => validationMessage(e, t, nameOf)).join(" ") });
     else if (res.reason === "AUTH") setSaveState({ kind: "auth" });
     else if (res.reason === "NOT_FOUND") {
       draft.set({ formulaId: null });
@@ -352,22 +360,33 @@ export function Creator({ notes, rules, pairs, events, concentrations, volumes, 
               />
             </div>
 
+            {staff?.client && (
+              <p className="rounded-xl bg-ink-3 px-4 py-3 text-sm">
+                <span className="text-muted">{t.creator.client}:</span> <span className="font-medium">{staff.client}</span>
+              </p>
+            )}
             <div className="grid gap-2">
-              <button type="button" className="btn btn-gold w-full" disabled={!result.ok || pending} onClick={onOrder}>
-                {pending ? t.common.saving : t.creator.order}
+              <button type="button" className="btn btn-gold w-full whitespace-normal text-center leading-tight py-2" disabled={!result.ok || pending} onClick={onSave}>
+                {pending ? t.common.saving : draft.formulaId ? t.creator.updateFormula : t.creator.saveToClient}
               </button>
-              <div className="grid gap-2">
-                <button type="button" className="btn btn-ghost btn-sm w-full" disabled={!result.ok || pending} onClick={onSave}>
-                  {draft.formulaId ? t.creator.updateFormula : t.creator.saveFormula}
-                </button>
-                <Link href="/match" className={`btn btn-ghost btn-sm w-full ${items.length === 0 ? "pointer-events-none opacity-45" : ""}`} aria-disabled={items.length === 0}>
-                  <Sparkles size={14} aria-hidden /> {t.creator.findMatch}
-                </Link>
-              </div>
+              <Link href={draft.formulaId ? `/match?formula=${draft.formulaId}` : "/match"} className={`btn btn-ghost btn-sm w-full whitespace-normal ${items.length === 0 ? "pointer-events-none opacity-45" : ""}`} aria-disabled={items.length === 0}>
+                <Sparkles size={14} aria-hidden /> {t.creator.findMatch}
+              </Link>
+              <p className="flex gap-2 text-xs text-muted"><Lock size={13} className="mt-0.5 shrink-0" aria-hidden /> {t.creator.staffNote}</p>
             </div>
 
             <div aria-live="polite" className="text-sm">
-              {saveState.kind === "saved" && <p className="text-ok">{t.common.saved}</p>}
+              {saveState.kind === "saved" && (
+                <p className="text-ok">
+                  {t.common.saved}
+                  {staff?.bookingId && (
+                    <>
+                      {" · "}
+                      <Link className="underline underline-offset-4" href={`/studio/bookings/${staff.bookingId}`}>{t.creator.backToBooking}</Link>
+                    </>
+                  )}
+                </p>
+              )}
               {saveState.kind === "error" && <p className="text-danger">{saveState.msg}</p>}
               {saveState.kind === "auth" && (
                 <p className="text-cream/80">

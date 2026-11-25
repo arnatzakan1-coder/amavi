@@ -1,4 +1,5 @@
 import NextAuth, { type DefaultSession } from "next-auth";
+export type Role = "USER" | "PERFUMER" | "ADMIN";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import Apple from "next-auth/providers/apple";
@@ -11,7 +12,7 @@ import { db, schema as s } from "@/db";
 
 declare module "next-auth" {
   interface Session {
-    user: { id: string; role: "USER" | "ADMIN" } & DefaultSession["user"];
+    user: { id: string; role: Role } & DefaultSession["user"];
   }
 }
 
@@ -92,7 +93,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async () => ({
     },
     async session({ session, token }) {
       if (token.uid) session.user.id = String(token.uid);
-      session.user.role = (token.role as "USER" | "ADMIN") ?? "USER";
+      session.user.role = (token.role as Role) ?? "USER";
       return session;
     },
   },

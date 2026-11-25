@@ -98,7 +98,7 @@ export function CheckoutForm({
     return (
       <div className="mt-10 card p-10 text-center">
         <p className="text-cream/75">{t.cart.empty}</p>
-        <Link href="/create" className="btn btn-gold mt-6">{t.cart.toCreator}</Link>
+        <Link href="/formulas" className="btn btn-gold mt-6">{t.cart.toCreator}</Link>
       </div>
     );
   }
@@ -188,10 +188,11 @@ export function CheckoutForm({
         {/* Delivery */}
         <fieldset className="card p-5 sm:p-7">
           <legend className="font-display text-2xl px-1">{t.checkout.delivery}</legend>
+          <p className="mt-2 text-sm text-muted">{t.checkout.reorderOnly}</p>
           <div className="mt-4 grid gap-2">
             {delivery.map((d) => (
               <label key={d.code} className={`flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer ${deliveryCode === d.code ? "border-champagne" : "border-line"}`}>
-                <input type="radio" name="delivery" className="accent-[#e6d3ae] h-4 w-4" checked={deliveryCode === d.code} onChange={() => setDeliveryCode(d.code)} />
+                <input type="radio" name="delivery" className="accent-[#2c0a71] h-4 w-4" checked={deliveryCode === d.code} onChange={() => setDeliveryCode(d.code)} />
                 <span className="flex-1">{d.name}</span>
                 <span className="text-sm text-muted tabular-nums">{d.priceKzt ? formatKzt(d.priceKzt, locale) : "0 ₸"}</span>
               </label>
@@ -205,12 +206,12 @@ export function CheckoutForm({
                 <div className="mt-3 grid gap-2">
                   {addresses.map((a) => (
                     <label key={a.id} className={`flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer ${addressId === a.id ? "border-champagne" : "border-line"}`}>
-                      <input type="radio" name="addr" className="accent-[#e6d3ae] h-4 w-4" checked={addressId === a.id} onChange={() => setAddressId(a.id)} />
+                      <input type="radio" name="addr" className="accent-[#2c0a71] h-4 w-4" checked={addressId === a.id} onChange={() => setAddressId(a.id)} />
                       <span className="text-sm">{a.label}</span>
                     </label>
                   ))}
                   <label className={`flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer ${addressId === "new" ? "border-champagne" : "border-line"}`}>
-                    <input type="radio" name="addr" className="accent-[#e6d3ae] h-4 w-4" checked={addressId === "new"} onChange={() => setAddressId("new")} />
+                    <input type="radio" name="addr" className="accent-[#2c0a71] h-4 w-4" checked={addressId === "new"} onChange={() => setAddressId("new")} />
                     <span className="text-sm">{t.checkout.newAddress}</span>
                   </label>
                 </div>
@@ -239,7 +240,7 @@ export function CheckoutForm({
                   </div>
                   <div className="sm:col-span-6">
                     <label className="flex items-center gap-3 text-sm text-cream/80 cursor-pointer">
-                      <input type="checkbox" className="accent-[#e6d3ae] h-4 w-4" checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} />
+                      <input type="checkbox" className="accent-[#2c0a71] h-4 w-4" checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} />
                       {t.checkout.saveAddress}
                     </label>
                   </div>
@@ -267,7 +268,7 @@ export function CheckoutForm({
                   id={i === 0 ? "f-payment" : undefined}
                   type="radio"
                   name="payment"
-                  className="accent-[#e6d3ae] h-4 w-4"
+                  className="accent-[#2c0a71] h-4 w-4"
                   disabled={!p.available}
                   checked={effectivePayment === p.code}
                   onChange={() => setPaymentCode(p.code)}
@@ -293,7 +294,7 @@ export function CheckoutForm({
         <OrderSummary price={price} showDelivery />
         <div>
           <label className="flex items-start gap-3 text-sm text-cream/85 cursor-pointer">
-            <input id="f-consent" type="checkbox" className="accent-[#e6d3ae] h-4 w-4 mt-0.5" checked={consent} onChange={(e) => setConsent(e.target.checked)} aria-invalid={errors.consent ? true : undefined} />
+            <input id="f-consent" type="checkbox" className="accent-[#2c0a71] h-4 w-4 mt-0.5" checked={consent} onChange={(e) => setConsent(e.target.checked)} aria-invalid={errors.consent ? true : undefined} />
             {t.checkout.consent}
           </label>
           {errors.consent && <p className="field-error">{errors.consent}</p>}

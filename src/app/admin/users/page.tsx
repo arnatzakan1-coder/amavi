@@ -12,7 +12,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
     .limit(500);
   return (
     <>
-      <H1 sub="Клиенты видят только свои формулы, адреса и заказы. Администраторы — всё в этой панели.">Пользователи</H1>
+      <H1 sub="Клиенты видят только названия своих формул, записи и заказы. Парфюмеры — раздел «Студия» (записи, анкеты, формулы). Администраторы — всё.">Пользователи</H1>
       <Saved show={sp.saved === "1"} />
       <div className="card overflow-x-auto">
         <table className="w-full text-sm min-w-[620px]">
@@ -29,6 +29,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
                     <label className="sr-only" htmlFor={`r-${u.id}`}>Роль</label>
                     <select id={`r-${u.id}`} name="role" defaultValue={u.role} className="field py-1.5 min-h-[38px] w-auto">
                       <option value="USER">Клиент</option>
+                      <option value="PERFUMER">Парфюмер</option>
                       <option value="ADMIN">Администратор</option>
                     </select>
                     <button className="btn btn-ghost btn-sm">OK</button>

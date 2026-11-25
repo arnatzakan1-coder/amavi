@@ -4,24 +4,22 @@ import { getI18n } from "@/i18n/server";
 import { pick } from "@/i18n";
 import { db, schema as s } from "@/db";
 import { getNotes } from "@/lib/data";
-import { currentUser } from "@/lib/session";
+import { requireStaff } from "@/lib/session";
 import { getFormulasForUser } from "@/lib/formulas";
 import { MatchView } from "@/components/match/MatchView";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
-  return { title: t.match.title, description: t.match.subtitle };
+  return { title: t.match.title, robots: { index: false } };
 }
 
 export default async function MatchPage({ searchParams }: { searchParams: Promise<{ formula?: string }> }) {
   const { t, locale } = await getI18n();
   const sp = await searchParams;
-  const [notes, niche, user] = await Promise.all([
-    getNotes(),
-    db.select().from(s.nicheFragrances).where(eq(s.nicheFragrances.active, true)),
-    currentUser(),
-  ]);
-  const formulas = user ? await getFormulasForUser(user.id) : [];
+  await requireStaff("/match");
+  const [notes, niche] = await Promise.all([getNotes(), db.select().from(s.nicheFragrances).where(eq(s.nicheFragrances.active, true))]);
+  // Staff tool: recent client formulas (confidential) for comparison.
+  const formulas = (await getFormulasForUser(null, sp.formula ? [sp.formula] : undefined)).slice(0, 60);
 
   return (
     <div className="container-lux py-10 sm:py-14">

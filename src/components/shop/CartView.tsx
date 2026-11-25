@@ -21,7 +21,7 @@ export function CartView({ config, volumes, concentrations }: { config: PriceCon
     return (
       <div className="mt-10 card p-10 text-center">
         <p className="text-cream/75">{t.cart.empty}</p>
-        <Link href="/create" className="btn btn-gold mt-6">{t.cart.toCreator}</Link>
+        <Link href="/formulas" className="btn btn-gold mt-6">{t.cart.toCreator}</Link>
       </div>
     );
   }
